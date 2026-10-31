@@ -9,8 +9,9 @@ try {
             await response.body?.cancel();
             throw new Error('Compromised chain accepted: ' + host);
         } catch (error) {
-            if (!/UnknownIssuer|CertRevoked|certificate revoked|unknown issuer/i.test(String(error))) throw error;
-            console.log('PASS:', host, String(error));
+            const reason = error instanceof Error ? `${error.message}: ${error.cause}` : String(error);
+            if (!/UnknownIssuer|CertRevoked|CertDistrusted|certificate revoked|unknown issuer/i.test(reason)) throw error;
+            console.log('PASS:', host, reason);
         }
     }
     Deno.exit(0);
