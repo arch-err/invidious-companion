@@ -13,6 +13,8 @@ ARG DENO_DIR='/deno-dir' \
     PORT='8282'
 
 # sha256 checksums for binaries
+ARG CHECK_CHECKSUMS=1
+
 ARG THC_AMD64_SHA256='cb1797948015da46c222764a99ee30c06a6a9a30f5b87f212a28ea3c6d07610d' \
     THC_ARM64_SHA256='c177033fd474af673bd64788d47e13708844f3946e1eb51cce6a422a23a5e8cc' \
     TINI_AMD64_SHA256='93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c' \
@@ -25,7 +27,7 @@ FROM alpine:3.24 AS dependabot-alpine
 FROM debian:13-slim AS dependabot-debian
 
 # Retrieve the deno binary from the repository
-FROM denoland/deno:bin-2.9.2 AS deno-bin
+FROM denoland/deno:bin-2.9.8 AS deno-bin
 
 
 # Stage for creating the non-privileged user
@@ -124,7 +126,7 @@ RUN --mount=type=bind,rw,source=.git,target=/app/.git \
     --mount=type=cache,target="${DENO_DIR}" \
     deno task compile
 
-FROM gcr.io/distroless/cc AS app
+FROM gcr.io/distroless/cc-debian13:nonroot AS app
 
 # Copy group file for the non-privileged user from the user-stage
 COPY --from=user-stage /etc/group /etc/group
